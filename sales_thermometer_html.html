@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Sales Thermometer - Q3 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #3182ce;
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .thermometer-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .thermometer-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .thermometer {
+            width: 80px;
+            height: 400px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            border: 4px solid #cbd5e0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .thermometer-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            border-radius: 40px;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(to top, #ef4444, #f97316, #eab308, #22c55e);
+        }
+
+        .thermometer-bulb {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #cbd5e0;
+            margin: 10px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .markers {
+            position: absolute;
+            right: -60px;
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .marker {
+            font-size: 0.8rem;
+            color: #6b7280;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .marker::before {
+            content: '';
+            position: absolute;
+            right: 35px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 2px;
+            background: #9ca3af;
+        }
+
+        .status-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .status-message {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .percentage {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #3182ce;
+            margin-bottom: 10px;
+        }
+
+        .week-info {
+            font-size: 1.2rem;
+            color: #718096;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .metric-card.goal {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 2px solid #3b82f6;
+        }
+
+        .metric-card.current {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 2px solid #22c55e;
+        }
+
+        .metric-card.remaining {
+            background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+            border: 2px solid #f97316;
+        }
+
+        .metric-card.target {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border: 2px solid #6366f1;
+        }
+
+        .metric-card.on-track {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border: 2px solid #22c55e;
+        }
+
+        .metric-card.off-track {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            border: 2px solid #ef4444;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+        }
+
+        .goal .metric-value { color: #3b82f6; }
+        .current .metric-value { color: #22c55e; }
+        .remaining .metric-value { color: #f97316; }
+        .target .metric-value { color: #6366f1; }
+        .on-track .metric-value { color: #22c55e; }
+        .off-track .metric-value { color: #ef4444; }
+
+        .progress-bar-section {
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .progress-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar-header span {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(to right, #ef4444, #f97316, #eab308, #22c55e);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .thermometer {
+                width: 60px;
+                height: 300px;
+            }
+            
+            .thermometer-bulb {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .percentage {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Sales Thermometer</h1>
+            <p>Q3 2025 Progress Tracker</p>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="quarterlyGoal">Quarterly Goal ($)</label>
+                <input type="number" id="quarterlyGoal" value="100000" min="0" step="1000">
+            </div>
+            <div class="input-group">
+                <label for="currentSales">Current New Sales ($)</label>
+                <input type="number" id="currentSales" value="65000" min="0" step="1000">
+            </div>
+            <div class="input-group">
+                <label for="weekNumber">Week #</label>
+                <input type="number" id="weekNumber" value="8" min="1" max="13">
+            </div>
+        </div>
+
+        <div class="thermometer-container">
+            <div class="thermometer-wrapper">
+                <div class="thermometer">
+                    <div class="thermometer-fill" id="thermometerFill"></div>
+                    <div class="markers">
+                        <div class="marker">100%</div>
+                        <div class="marker">75%</div>
+                        <div class="marker">50%</div>
+                        <div class="marker">25%</div>
+                        <div class="marker">0%</div>
+                    </div>
+                </div>
+                <div class="thermometer-bulb" id="thermometerBulb">$</div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <div class="status-message" id="statusMessage">Strong Progress! 📈</div>
+            <div class="percentage" id="percentage">65.0%</div>
+            <div class="week-info" id="weekInfo">Week 8 of Quarter</div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric-card goal">
+                <div class="metric-icon">🎯</div>
+                <div class="metric-label">Goal</div>
+                <div class="metric-value" id="goalValue">$100,000</div>
+            </div>
+            <div class="metric-card current">
+                <div class="metric-icon">📈</div>
+                <div class="metric-label">Current New Sales</div>
+                <div class="metric-value" id="currentValue">$65,000</div>
+            </div>
+            <div class="metric-card target">
+                <div class="metric-icon">⏱️</div>
+                <div class="metric-label">Should Have by Now</div>
+                <div class="metric-value" id="targetValue">$61,538</div>
+            </div>
+            <div class="metric-card remaining">
+                <div class="metric-icon">💰</div>
+                <div class="metric-label">Remaining</div>
+                <div class="metric-value" id="remainingValue">$35,000</div>
+            </div>
+            <div class="metric-card" id="trackingCard">
+                <div class="metric-icon" id="trackingIcon">✅</div>
+                <div class="metric-label">Status</div>
+                <div class="metric-value" id="trackingValue">ON TRACK</div>
+            </div>
+        </div>
+
+        <div class="progress-bar-section">
+            <div class="progress-bar-header">
+                <span>Progress Bar View</span>
+                <span id="progressBarPercentage">65.0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+            }).format(amount);
+        }
+
+        function getThermometerColor(percentage) {
+            if (percentage >= 100) return '#22c55e';
+            if (percentage >= 75) return '#eab308';
+            if (percentage >= 50) return '#f97316';
+            return '#ef4444';
+        }
+
+        function getStatusMessage(percentage, isOverGoal) {
+            if (isOverGoal) return 'Goal Exceeded! 🎉';
+            if (percentage >= 90) return 'Almost There! 💪';
+            if (percentage >= 75) return 'Strong Progress! 📈';
+            if (percentage >= 50) return 'Halfway There! 🚀';
+            return 'Keep Pushing! 💼';
+        }
+
+        function updateThermometer() {
+            const quarterlyGoal = Number(document.getElementById('quarterlyGoal').value);
+            const currentSales = Number(document.getElementById('currentSales').value);
+            const weekNumber = Number(document.getElementById('weekNumber').value);
+
+            const progressPercentage = Math.min((currentSales / quarterlyGoal) * 100, 100);
+            const isOverGoal = currentSales > quarterlyGoal;
+            const remaining = Math.max(quarterlyGoal - currentSales, 0);
+
+            // Calculate weekly target and tracking status
+            const weeklyTarget = quarterlyGoal / 13;
+            const targetByWeek = weeklyTarget * weekNumber;
+            const isOnTrack = currentSales >= targetByWeek;
+            const trackingDifference = currentSales - targetByWeek;
+
+            // Update thermometer fill
+            const thermometerFill = document.getElementById('thermometerFill');
+            thermometerFill.style.height = progressPercentage + '%';
+            
+            // Update thermometer bulb color
+            const thermometerBulb = document.getElementById('thermometerBulb');
+            thermometerBulb.style.background = getThermometerColor(progressPercentage);
+
+            // Update status
+            document.getElementById('statusMessage').textContent = getStatusMessage(progressPercentage, isOverGoal);
+            document.getElementById('percentage').textContent = progressPercentage.toFixed(1) + '%';
+            document.getElementById('weekInfo').textContent = `Week ${weekNumber} of Quarter`;
+
+            // Update metrics
+            document.getElementById('goalValue').textContent = formatCurrency(quarterlyGoal);
+            document.getElementById('currentValue').textContent = formatCurrency(currentSales);
+            document.getElementById('remainingValue').textContent = formatCurrency(remaining);
+            document.getElementById('targetValue').textContent = formatCurrency(targetByWeek);
+
+            // Update tracking status
+            const trackingCard = document.getElementById('trackingCard');
+            const trackingIcon = document.getElementById('trackingIcon');
+            const trackingValue = document.getElementById('trackingValue');
+            
+            if (isOnTrack) {
+                trackingCard.className = 'metric-card on-track';
+                trackingIcon.textContent = '✅';
+                trackingValue.textContent = 'ON TRACK';
+            } else {
+                trackingCard.className = 'metric-card off-track';
+                trackingIcon.textContent = '⚠️';
+                trackingValue.textContent = 'OFF TRACK';
+            }
+
+            // Update progress bar
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = Math.min(progressPercentage, 100) + '%';
+            document.getElementById('progressBarPercentage').textContent = progressPercentage.toFixed(1) + '%';
+        }
+
+        // Add event listeners
+        document.getElementById('quarterlyGoal').addEventListener('input', updateThermometer);
+        document.getElementById('currentSales').addEventListener('input', updateThermometer);
+        document.getElementById('weekNumber').addEventListener('input', updateThermometer);
+
+        // Initial update
+        updateThermometer();
+    </script>
+</body>
+</html>
